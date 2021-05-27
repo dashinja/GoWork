@@ -44,6 +44,9 @@ func main() {
 
 	sig := <- sigchan
 	l.Println("Received terminate, graceful shutdown", sig)
-	timeoutContext, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	timeoutContext, resourceCancellation := context.WithTimeout(context.Background(), 30*time.Second)
+
+	resourceCancellation();
+	
 	server.Shutdown(timeoutContext)
 }

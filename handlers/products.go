@@ -15,7 +15,19 @@ func NewProducts(l *log.Logger) *Products {
 	return &Products{l}
 }
 
-func (p *Products) ServeHTTP(rw http.ResponseWriter, h *http.Request) {
+func (p *Products) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		p.getProducts(rw, r)
+		return
+	}
+	// handle an update pending...
+
+	
+	// catch all
+	rw.WriteHeader(http.StatusMethodNotAllowed)
+}
+
+func (p *Products) getProducts(rw http.ResponseWriter, r *http.Request) {
 	lp := data.GetProduct()
 
 	err := lp.ToJSON(rw)
@@ -24,4 +36,5 @@ func (p *Products) ServeHTTP(rw http.ResponseWriter, h *http.Request) {
 		log.Fatal(err)
 		http.Error(rw, "Unable to marshal json", http.StatusInternalServerError)
 	}
+
 }
