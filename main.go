@@ -14,12 +14,14 @@ import (
 func main() {
 	l := log.New(os.Stdout, "product-api", log.LstdFlags)
 
-	hh := handlers.NewHello(l)
-	gh := handlers.NewGoodBye(l)
+	// hh := handlers.NewHello(l)
+	// gh := handlers.NewGoodBye(l)
+	ph := handlers.NewProducts(l)
 
 	sm := http.NewServeMux()
-	sm.Handle("/", hh)
-	sm.Handle("/goodbye", gh)
+	sm.Handle("/", ph)
+	// sm.Handle("/", hh)
+	// sm.Handle("/goodbye", gh)
 
 	server := &http.Server{
 		Addr:         ":3000",
@@ -42,6 +44,9 @@ func main() {
 
 	sig := <- sigchan
 	l.Println("Received terminate, graceful shutdown", sig)
-	timeoutContext, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	timeoutContext, resourceCancellation := context.WithTimeout(context.Background(), 30*time.Second)
+
+	resourceCancellation();
+	
 	server.Shutdown(timeoutContext)
 }
